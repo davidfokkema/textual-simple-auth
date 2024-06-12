@@ -1,0 +1,12 @@
+Screen {
+    align: center middle;
+    background: black;
+    hatch: left $primary-background;
+}
+
+Label {
+    border: round $secondary;
+    background: $panel;
+    padding: 1 2;
+    color: $secondary;
+}
