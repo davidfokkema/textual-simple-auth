@@ -1,0 +1,23 @@
+Screen {
+    align: center middle;
+    background: black;
+    hatch: right $primary-background;
+}
+
+Grid {
+    border: panel $primary;
+    border-title-color: $text;
+    border-title-style: bold;
+    padding: 0 2; 
+    width: 70;
+    height: auto;
+    grid-size: 2;
+    grid-columns: auto 1fr;
+    grid-gutter: 1 2;
+
+    &> Label {
+        height: 100%;
+        width: 100%;
+        content-align: right middle;
+    }
+}
