@@ -5,7 +5,8 @@ from textual.screen import Screen
 from textual.widgets import Button, Label
 
 
-class MyScreen(Screen):
+class Login(App):
+    auth_successful = False
 
     def compose(self) -> ComposeResult:
         yield Button("Login", id="login")
@@ -14,15 +15,8 @@ class MyScreen(Screen):
     @on(Button.Pressed)
     def login(self, event: Button.Pressed) -> None:
         if event.button.id == "login":
-            self.app.auth_successful = True
-        self.app.exit()
-
-
-class Login(App):
-    auth_successful = False
-
-    def on_mount(self) -> None:
-        self.push_screen(MyScreen())
+            self.auth_successful = True
+        self.exit()
 
 
 class SimpleAuthDemo(App):
