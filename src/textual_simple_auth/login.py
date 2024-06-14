@@ -25,17 +25,18 @@ class LoginApp(App[bool]):
             yield Button("Login", id="login", variant="primary")
             yield Button("Cancel", id="cancel", variant="error")
 
-    @on(Button.Pressed)
-    def login(self, event: Button.Pressed) -> None:
-        print(f"{event.button.id=}")
-        if event.button.id == "login":
-            username = self.query_one("#name").value
-            password = self.query_one("#password").value
+    @on(Button.Pressed, "#cancel")
+    def cancel(self) -> None:
+        self.exit(result=False)
 
-            result = auth.verify_password(
+    @on(Input.Submitted, "#password")
+    @on(Button.Pressed, "#login")
+    def verify_and_exit(self) -> None:
+        username = self.query_one("#name").value
+        password = self.query_one("#password").value
+
+        self.exit(
+            result=auth.verify_password(
                 username, password, self.app_name, self.app_author
             )
-
-        else:
-            result = False
-        self.exit(result=result)
+        )
