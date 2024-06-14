@@ -21,17 +21,21 @@ def login_required(cls):
     return cls
 
 
-def add_auth(command: str = "auth", help: str = "Manage user authentication."):
+def add_auth(command: str = "auth"):
     def decorator(app: click.Group | click.Command):
-        def wrapped_tui():
-            print("Running my custom thingy.")
+        @click.command()
+        @click.option("-N", "--number", default=3)
+        def wrapped_tui(number):
+            """Manage user authentication."""
+            for idx in range(1, number + 1):
+                print(f"{idx}. Running my custom thingy.")
 
         if isinstance(app, click.Group):
-            app.command(name=command, help=help)(wrapped_tui)
+            app.add_command(wrapped_tui, name=command)
         else:
             new_group = click.Group()
             new_group.add_command(app)
-            new_group.command(name=command, help=help)(wrapped_tui)
+            new_group.add_command(wrapped_tui, name=command)
             return new_group
 
         return app
