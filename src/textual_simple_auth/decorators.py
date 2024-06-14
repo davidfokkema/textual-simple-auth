@@ -32,8 +32,13 @@ def add_auth(app_name: str, app_author: str | None = None, command: str = "auth"
         if isinstance(app, click.Group):
             app.add_command(auth, name=command)
         else:
-            new_group = click.Group()
-            new_group.add_command(app)
+
+            @click.group(invoke_without_command=True)
+            @click.pass_context
+            def new_group(ctx):
+                if ctx.invoked_subcommand is None:
+                    app()
+
             new_group.add_command(auth, name=command)
             return new_group
 
