@@ -1,4 +1,24 @@
 import click
+from rich import print
+
+from textual_simple_auth.auth import LoginApp
+
+
+def auth(cls):
+    run = cls.run
+
+    def new_run(self) -> None:
+        login_app = LoginApp()
+        success = login_app.run()
+        if success is True:
+            run(self)
+        else:
+            print(
+                "[red]Authentication failed. You need to log in to access this app.[/]"
+            )
+
+    cls.run = new_run
+    return cls
 
 
 def add_auth(command: str = "auth", help: str = "Manage user authentication."):
@@ -17,14 +37,3 @@ def add_auth(command: str = "auth", help: str = "Manage user authentication."):
         return app
 
     return decorator
-
-
-@add_auth()
-@click.command()
-def thingy():
-    """Does the thingy."""
-    print("This is main!")
-
-
-if __name__ == "__main__":
-    thingy()

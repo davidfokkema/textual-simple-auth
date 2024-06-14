@@ -25,30 +25,3 @@ class LoginApp(App[bool]):
             self.exit(result=True)
         else:
             self.exit(result=False)
-
-
-def auth(cls):
-    run = cls.run
-
-    def new_run(self) -> None:
-        login_app = LoginApp()
-        success = login_app.run()
-        if success is True:
-            run(self)
-        else:
-            print(
-                "[red]Authentication failed. You need to log in to access this app.[/]"
-            )
-
-    cls.run = new_run
-    return cls
-
-
-@auth
-class A:
-    def run(self) -> None:
-        print("Running my app!")
-
-
-if __name__ == "__main__":
-    A().run()
