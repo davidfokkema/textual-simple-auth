@@ -1,16 +1,26 @@
 [tool.poetry]
 name = "textual-simple-auth"
 version = "0.1.0"
-description = ""
+description = "Simple authentication for Textual apps."
 authors = ["David Fokkema <davidfokkema@icloud.com>"]
 readme = "README.md"
-packages = [{include = "textual_simple_auth", from = "src"}]
+packages = [{ include = "textual_simple_auth", from = "src" }]
+license = "MIT"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Programming Language :: Python",
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 textual = "^0.67.1"
 platformdirs = "^4.2.2"
-
 
 [tool.poetry.group.dev.dependencies]
 textual-dev = "^1.5.1"
