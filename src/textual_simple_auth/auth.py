@@ -28,7 +28,7 @@ def auth():
 @click.pass_context
 def show(ctx):
     """Show passwords file contents and location."""
-    path = get_passwords_path(ctx)
+    path = get_passwords_path_using_context(ctx)
     print(f"Looking for passwords file: '{path}'.")
     if path.exists():
         print()
@@ -42,7 +42,7 @@ def show(ctx):
 @click.pass_context
 def list(ctx):
     """List users."""
-    users = parse_passwords(ctx)
+    users = get_passwords_using_context(ctx)
     table = Table(title="Registered users", box=box.SIMPLE)
     table.add_column("Username")
     table.add_column("Salt (base64 encoded)")
@@ -66,7 +66,7 @@ def add(ctx, username):
     salt = os.urandom(18)
     hash = hash_password(password, salt)
 
-    users = parse_passwords(ctx)
+    users = get_passwords_using_context(ctx)
     users[username] = User(name=username, salt=salt, hash=hash)
     save_passwords(ctx, users)
     print(f"Added user {username} to passwords file.")
@@ -84,7 +84,7 @@ def hash_password(password: bytes, salt: bytes) -> bytes:
 @click.argument("username", type=str)
 def remove(ctx, username):
     """Remove user."""
-    users = parse_passwords(ctx)
+    users = get_passwords_using_context(ctx)
     try:
         del users[username]
     except KeyError:
@@ -94,21 +94,32 @@ def remove(ctx, username):
         print(f"Removed user {username} from passwords file.")
 
 
-def get_passwords_path(ctx: click.Context) -> pathlib.Path:
+def get_passwords_path_using_context(ctx: click.Context) -> pathlib.Path:
     """Get path to password file."""
     app_name = ctx.obj["app_name"]
     app_author = ctx.obj["app_author"]
+    return get_passwords_path(app_name, app_author)
+
+
+def get_passwords_path(app_name: str, app_author: str | None = None) -> pathlib.Path:
+    """Get path of the passwords file."""
     if not app_name:
         raise RuntimeError("Providing app_name is required.")
     return pathlib.Path(platformdirs.user_data_dir(app_name, app_author)) / "shadow"
 
 
-def parse_passwords(ctx: click.Context) -> dict[str, User]:
+def get_passwords_using_context(ctx: click.Context) -> dict[str, User]:
+    """Get passwords using information from a click context object."""
     try:
-        contents = get_passwords_path(ctx).read_bytes()
+        contents = get_passwords_path_using_context(ctx).read_bytes()
     except FileNotFoundError:
         contents = ""
 
+    return parse_passwords(contents)
+
+
+def parse_passwords(contents: bytes) -> dict[str, User]:
+    """Parse passwords file contents."""
     users = {}
     for line in contents.splitlines():
         name_, salt, hash = line.split(b"$")
@@ -120,7 +131,8 @@ def parse_passwords(ctx: click.Context) -> dict[str, User]:
 
 
 def save_passwords(ctx: click.Context, users: dict[str, User]) -> None:
-    path = get_passwords_path(ctx)
+    """Save passwords to passwords file."""
+    path = get_passwords_path_using_context(ctx)
 
     contents = b"\n".join(
         [
@@ -137,6 +149,27 @@ def save_passwords(ctx: click.Context, users: dict[str, User]) -> None:
 
     path.parent.mkdir(exist_ok=True, parents=True)
     path.write_bytes(contents)
+
+
+def verify_password(
+    username: str, password: str, app_name: str, app_author: str | None = None
+) -> bool:
+    """Verify password by checking against password file."""
+    try:
+        contents = get_passwords_path(app_name, app_author).read_bytes()
+    except FileNotFoundError:
+        contents = ""
+    users = parse_passwords(contents)
+
+    try:
+        user = users[username]
+    except KeyError:
+        return False
+
+    hash = hash_password(password=password.encode(), salt=user.salt)
+    if hash == user.hash:
+        return True
+    return False
 
 
 def _time_hashing_passwords(N: int) -> float:

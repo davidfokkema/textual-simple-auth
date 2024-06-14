@@ -5,7 +5,7 @@ from textual.widgets import Label
 from textual_simple_auth.decorators import add_auth, login_required
 
 
-@login_required
+@login_required(app_name="textual_simple_auth")
 class SimpleAuthDemo(App):
     CSS_PATH = "demo.tcss"
 
