@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "textual-simple-auth"
-version = "0.1.0"
+version = "0.2.0"
 description = "Simple authentication for Textual apps."
 authors = ["David Fokkema <davidfokkema@icloud.com>"]
 readme = "README.md"
