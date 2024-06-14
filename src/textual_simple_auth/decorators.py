@@ -22,8 +22,10 @@ def login_required(cls):
     return cls
 
 
-def add_auth(command: str = "auth"):
+def add_auth(app_name: str, app_author: str | None = None, command: str = "auth"):
     def decorator(app: click.Group | click.Command):
+        context = {"obj": {"app_name": app_name, "app_author": app_author}}
+        auth.context_settings |= context
         if isinstance(app, click.Group):
             app.add_command(auth, name=command)
         else:

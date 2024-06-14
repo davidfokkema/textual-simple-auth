@@ -13,7 +13,7 @@ class SimpleAuthDemo(App):
         yield Label("This should only be accessible after login.")
 
 
-@add_auth()
+@add_auth(app_name="textual_simple_auth")
 @click.command()
 def demo():
     """Run a simple app to demonstrate login."""

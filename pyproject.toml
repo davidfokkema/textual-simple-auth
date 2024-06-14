@@ -9,6 +9,7 @@ packages = [{include = "textual_simple_auth", from = "src"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 textual = "^0.67.1"
+platformdirs = "^4.2.2"
 
 
 [tool.poetry.group.dev.dependencies]
