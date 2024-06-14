@@ -6,7 +6,7 @@ from textual.widgets import Button, Input, Label
 
 class LoginApp(App[bool]):
 
-    CSS_PATH = "auth.tcss"
+    CSS_PATH = "login.tcss"
 
     def compose(self) -> ComposeResult:
         with (grid := Grid()):

@@ -1,10 +1,10 @@
 import click
 from rich import print
 
-from textual_simple_auth.auth import LoginApp
+from textual_simple_auth.login import LoginApp
 
 
-def auth(cls):
+def login_required(cls):
     run = cls.run
 
     def new_run(self) -> None:

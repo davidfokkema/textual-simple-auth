@@ -2,10 +2,10 @@ import click
 from textual.app import App, ComposeResult
 from textual.widgets import Label
 
-from textual_simple_auth.decorators import add_auth, auth
+from textual_simple_auth.decorators import add_auth, login_required
 
 
-@auth
+@login_required
 class SimpleAuthDemo(App):
     CSS_PATH = "demo.tcss"
 
