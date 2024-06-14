@@ -2,6 +2,7 @@ import base64
 import hashlib
 import os
 import pathlib
+import time
 from dataclasses import dataclass
 
 import click
@@ -28,7 +29,7 @@ def auth():
 def show(ctx):
     """Show passwords file contents and location."""
     path = get_passwords_path(ctx)
-    print(f"Looking for passwords file at '{path}'.")
+    print(f"Looking for passwords file: '{path}'.")
     if path.exists():
         print()
         print("Contents:")
@@ -58,24 +59,39 @@ def list(ctx):
 
 @auth.command()
 @click.pass_context
-@click.argument("username")
+@click.argument("username", type=str)
 def add(ctx, username):
     """Add user or update password."""
     password = Prompt.ask("Password", password=True).encode()
     salt = os.urandom(18)
-    hash = hashlib.pbkdf2_hmac(
-        "sha256", password=password, salt=salt, iterations=500_000
-    )
+    hash = hash_password(password, salt)
 
     users = parse_passwords(ctx)
     users[username] = User(name=username, salt=salt, hash=hash)
     save_passwords(ctx, users)
+    print(f"Added user {username} to passwords file.")
+
+
+def hash_password(password: bytes, salt: bytes) -> bytes:
+    """Hash password using pbkdf2_hmac."""
+    return hashlib.pbkdf2_hmac(
+        "sha256", password=password, salt=salt, iterations=500_000
+    )
 
 
 @auth.command()
-def remove():
+@click.pass_context
+@click.argument("username", type=str)
+def remove(ctx, username):
     """Remove user."""
-    ...
+    users = parse_passwords(ctx)
+    try:
+        del users[username]
+    except KeyError:
+        print(f"[red]User {username} not found in passwords file.[/]")
+    else:
+        save_passwords(ctx, users)
+        print(f"Removed user {username} from passwords file.")
 
 
 def get_passwords_path(ctx: click.Context) -> pathlib.Path:
@@ -121,3 +137,16 @@ def save_passwords(ctx: click.Context, users: dict[str, User]) -> None:
 
     path.parent.mkdir(exist_ok=True, parents=True)
     path.write_bytes(contents)
+
+
+def _time_hashing_passwords(N: int) -> float:
+    t0 = time.monotonic()
+    for _ in range(N):
+        hash_password("mypassword".encode(), "mysalt".encode())
+    return time.monotonic() - t0
+
+
+if __name__ == "__main__":
+    N = 50
+    duration = _time_hashing_passwords(N)
+    print(f"Hashing passwords takes {1000 * duration / N:.1f} ms per operation.")
