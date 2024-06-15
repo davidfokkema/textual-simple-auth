@@ -4,7 +4,7 @@ Screen {
     hatch: left $primary-background;
 }
 
-Label {
+#msg {
     border: round $secondary;
     background: $panel;
     padding: 1 2;

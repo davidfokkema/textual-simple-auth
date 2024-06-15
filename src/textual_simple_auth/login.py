@@ -1,12 +1,20 @@
-from rich import print
-from textual.app import App, ComposeResult, on
+from textual.app import ComposeResult, on
 from textual.containers import Grid
+from textual.screen import Screen
 from textual.widgets import Button, Input, Label
 
 from textual_simple_auth import auth
 
 
-class LoginApp(App[bool]):
+class BlackScreen(Screen, inherit_css=False):
+    CSS = """
+        BlackScreen {
+            background: black;
+        }
+    """
+
+
+class LoginScreen(Screen, inherit_css=False):
 
     CSS_PATH = "login.tcss"
 
@@ -27,7 +35,7 @@ class LoginApp(App[bool]):
 
     @on(Button.Pressed, "#cancel")
     def cancel(self) -> None:
-        self.exit(result=False)
+        self.dismiss(False)
 
     @on(Input.Submitted, "#password")
     @on(Button.Pressed, "#login")
@@ -35,8 +43,6 @@ class LoginApp(App[bool]):
         username = self.query_one("#name").value
         password = self.query_one("#password").value
 
-        self.exit(
-            result=auth.verify_password(
-                username, password, self.app_name, self.app_author
-            )
+        self.dismiss(
+            auth.verify_password(username, password, self.app_name, self.app_author)
         )

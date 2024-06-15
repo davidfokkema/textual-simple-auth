@@ -1,4 +1,4 @@
-Screen {
+LoginScreen {
     align: center middle;
     background: black;
     hatch: right $primary-background;
